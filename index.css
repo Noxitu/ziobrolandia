@@ -53,7 +53,7 @@ main.double :nth-child(3) {
   display: none;
 }
 
-#main2 {
+#main2, #main3 {
   position: absolute;
   top: 0;
   left: 0;
@@ -80,6 +80,12 @@ input {
 input:focus {
   outline-width: 0;
   border-bottom: .1em solid rgba(245, 121, 0, 50%);
+}
+
+.loading {
+  color: white;
+  font-family: 'Comic Sans MS';
+  font-size: 4em;
 }
 
 .bonus {
