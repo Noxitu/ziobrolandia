@@ -1,0 +1,77 @@
+<script src="engine.js"></script>
+<script src="crypto.js"></script>
+
+<style>
+#drop-zone {
+    display: inline-block;  
+    border: 1px dashed black;
+    margin: 25px;
+    padding: 25px;
+}
+#drop-zone.drag-hover {
+    background: rgba(255, 255, 0, 0.1);
+}
+</style>
+<a id="download-link">Download decrypted</a> <br>
+<div id="drop-zone">[Drop here]</div> <br>
+<a id="download-crypto" href="javascript:alert('none yet')">Download encrypted</a>
+<script>
+    let key = null
+    
+    async function admin()
+    {
+        const password = prompt('Password:', '')
+        key = await get_key(password)
+        const ok = await is_key_correct(key)
+    
+        if (!ok)
+        {
+            alert('Wrong:' + await cryptogram_password_ok)
+            return
+        }
+    
+        const text = await decrypt(key, await cryptogram)
+        const data = new Blob([text], {type: 'text/plain'})
+        const url = window.URL.createObjectURL(data)
+        document.getElementById('download-link').href = url
+
+        var dropzone = document.getElementById('drop-zone')
+
+        dropzone.addEventListener('dragover', function(ev)
+        {
+            ev.preventDefault()
+            dropzone.classList.add('drag-hover')
+        })
+
+        dropzone.addEventListener('dragleave', function(ev)
+        {
+            dropzone.classList.remove('drag-hover')
+        })
+
+        dropzone.addEventListener('drop', function(ev)
+        {
+            ev.preventDefault()
+            dropzone.classList.remove('drag-hover')
+
+            const reader = new FileReader()
+
+            reader.addEventListener('loadend', async function(ev)
+            {
+                const content = await encrypt(key, ev.srcElement.result)
+                const crypto_js = [
+                    `const cryptogram_password_ok = "${cryptogram_password_ok}"`,
+                    `const cryptogram = "${content}"`
+                ].join('\n')
+                
+                const data = new Blob([crypto_js], {type: 'text/plain'})
+                const url = window.URL.createObjectURL(data)
+                document.getElementById('download-crypto').href = url
+            })
+
+            reader.readAsText(ev.dataTransfer.files[0])
+        })
+    }
+    
+    admin()
+    
+    </script>
